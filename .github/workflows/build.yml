@@ -1,0 +1,64 @@
+name: Roulette Tracker
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build Roulette Tracker APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      - name: Find Android project
+        run: |
+          echo "Repository files:"
+          find . -maxdepth 3 -type f \( -name "settings.gradle" -o -name "settings.gradle.kts" -o -name "build.gradle" -o -name "build.gradle.kts" \) -print
+
+      - name: Build APK
+        run: |
+          if [ -f "./gradlew" ]; then
+            chmod +x ./gradlew
+            ./gradlew assembleDebug --no-daemon
+          elif [ -f "./build.gradle" ] || [ -f "./build.gradle.kts" ]; then
+            gradle assembleDebug --no-daemon
+          elif [ -f "./RouletteOverlay/gradlew" ]; then
+            cd RouletteOverlay
+            chmod +x ./gradlew
+            ./gradlew assembleDebug --no-daemon
+          elif [ -f "./RouletteOverlay/build.gradle" ] || [ -f "./RouletteOverlay/build.gradle.kts" ]; then
+            cd RouletteOverlay
+            gradle assembleDebug --no-daemon
+          else
+            echo "Android Gradle project not found."
+            find . -maxdepth 4 -type f | head -200
+            exit 1
+          fi
+
+      - name: Find APK
+        run: |
+          find . -type f -name "*.apk" -print
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Roulette-Tracker
+          path: |
+            **/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
