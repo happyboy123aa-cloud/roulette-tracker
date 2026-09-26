@@ -1,0 +1,39 @@
+name: Build Roulette Tracker APK
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Extract Android project
+        run: |
+          unzip -o RouletteOverlayProject.zip
+          ls -la
+          ls -la RouletteOverlay
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.6'
+
+      - name: Build APK
+        working-directory: RouletteOverlay
+        run: gradle assembleDebug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Roulette-Tracker-APK
+          path: RouletteOverlay/app/build/outputs/apk/debug/*.apk
