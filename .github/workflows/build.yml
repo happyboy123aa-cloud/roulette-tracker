@@ -1,4 +1,4 @@
-name: Build APK
+name: Roulette Tracker
 
 on:
   workflow_dispatch:
