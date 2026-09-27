@@ -1,4 +1,4 @@
-name: Roulette Tracker APK
+name: Date Me APK
 
 on:
   workflow_dispatch:
