@@ -1,4 +1,4 @@
-name: Build Roulette Track Lite
+name: Build Paper Bets
 
 on:
   workflow_dispatch:
